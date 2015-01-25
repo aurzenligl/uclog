@@ -1,3 +1,14 @@
+# Eclipse
+.cproject
+.project
+.pydevproject
+.settings
+
+# Waf
+build
+.waf*
+.lock-waf*
+
 # Compiled Object files
 *.slo
 *.lo
