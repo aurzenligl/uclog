@@ -55,3 +55,17 @@ if at all.
 Additional care needs to be taken to decode binary logs, but logging
 interface is the same as for sprintf storages,
 so binary and textual printfs can be used interchangeably.
+
+How to store format strings with binary arguments:
+- store fmt verbatim
+- store fmt pointer
+  - get pointer-string pairs from running application or from linked binary
+- store fmt hash
+  - get hash-string pairs from application source code
+  - #define LOG(LEVEL, FMT, ...) { static const hasher hasher_(FMT); log.log(LEVEL, FMT, ##__VA_ARGS__, hasher_.hash); }
+  - modify vsnbprintf function so that it returns the one-after-the-last argument: hash
+- store fmt id
+  - make sure that each log is assigned unique id
+  - get id-string pairs from application source code
+  - #define LOG(ID, LEVEL, FMT, ...) log.log(LEVEL, FMT, ##__VA_ARGS__, ID)
+  - modify vsnbprintf function so that it returns the one-after-the-last argument: id
