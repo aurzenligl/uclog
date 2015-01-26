@@ -34,4 +34,28 @@ TEST(bprintf, prints_int)
     EXPECT_EQ(sizeof(long long), written);
     EXPECT_EQ(bytes(&ref, sizeof(long long)), bytes(&buf, sizeof(long long)));
 }
+
+TEST(bprintf, prints_char)
+{
+    char buf[1024] = {0};
+    int written = snbprintf(buf, 1024, "%c", 42);
+    EXPECT_EQ(1, written);
+    EXPECT_EQ('\x2a', buf[0]);
+}
+
+TEST(bprintf, prints_pointer)
+{
+    char buf[1024] = {0};
+    void* ptr = buf + 999;
+    int written = snbprintf(buf, 1024, "%p", ptr);
+    EXPECT_EQ(sizeof(void*), written);
+    EXPECT_EQ(bytes(&ptr, sizeof(void*)), bytes(buf, sizeof(void*)));
+}
+
+TEST(bprintf, prints_string)
+{
+    char buf[1024] = {0};
+    int written = snbprintf(buf, 1024, "%s", "the string");
+    EXPECT_EQ(11, written);
+    EXPECT_EQ(bytes("the string\0"), bytes(buf, 11));
 }

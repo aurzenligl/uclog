@@ -1,4 +1,5 @@
 #include <uclog/bprintf.hpp>
+#include <cstdint>
 #include <cstring>
 
 namespace uclog
@@ -49,7 +50,29 @@ static int arg_decode(const char* fmt, arg_spec* spec)
         }
     }
 
-    return ++fmt - start;
+    switch (*fmt)
+    {
+    case 'c':
+        spec->type = 'H';
+        return ++fmt - start;
+    case 's':
+        spec->type = 's';
+        return ++fmt - start;
+    case 'p':
+        spec->type = 'p';
+        return ++fmt - start;
+    case 'o':
+    case 'x':
+    case 'X':
+    case 'd':
+    case 'i':
+    case 'u':
+        // type of integer has already been determined
+        return ++fmt - start;
+    default:
+        spec->type = 0;
+        return fmt - start;
+    }
 }
 
 int vsnbprintf(char* buf, size_t size, const char* fmt, va_list args)
@@ -102,6 +125,17 @@ do                                                      \
             break;
         case 'd':
             save_arg(int);
+            break;
+        case 'p':
+            save_arg(uintptr_t);
+            break;
+        case 's':
+            const char* str = va_arg(args, const char*);
+            while (*str && (buf < end))
+            {
+                *buf++ = *str++;
+            }
+            *buf++ = 0;
             break;
         }
     }
