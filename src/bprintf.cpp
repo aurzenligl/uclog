@@ -1,5 +1,5 @@
 #include <uclog/bprintf.hpp>
-#include <cstdint>
+#include <stdint.h>
 #include <cstring>
 
 namespace uclog

@@ -14,12 +14,12 @@ def build(ctx):
         includes = 'include',
         export_includes = 'include',
         source = ctx.path.ant_glob('src/*.cpp'),
-        cxxflags = '-g -Wall -std=gnu++0x')
+        cxxflags = '-g -Wall')
 
     ctx(features = 'cxx cxxprogram test',
         target = 'test_uclog',
         source = ctx.path.ant_glob('test/*.cpp'),
-        cxxflags = '-g -Wall -std=gnu++0x',
+        cxxflags = '-g -Wall',
         lib = 'gtest pthread',
         use = 'uclog')
 
