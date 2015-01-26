@@ -24,7 +24,7 @@ static int arg_decode(const char* fmt, arg_spec* spec)
         }
     }
 
-    if (fmt != start || !*fmt)
+    if (!*fmt)
     {
         return fmt - start;
     }
