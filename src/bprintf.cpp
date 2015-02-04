@@ -116,6 +116,9 @@ static size_t arg_decode(const char* fmt, arg_spec* spec)
         // like in scanf functions
         spec->type = (spec->type == 'l') ? 'F' : 'f';
         return ++fmt - start;
+    case '%':
+        spec->type = 0;
+        return ++fmt - start;
     default:
         spec->type = 0;
         return fmt - start;
@@ -213,7 +216,7 @@ size_t snbprintf(uint8_t* buf, size_t size, const char* fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    int read = vsnbprintf(buf, size, fmt, args);
+    size_t read = vsnbprintf(buf, size, fmt, args);
     va_end(args);
     return read;
 }

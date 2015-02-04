@@ -9,11 +9,13 @@ using namespace uclog;
 // *** WARNING ***
 // these tests will work only on little endian machines
 
-template <typename T>
-std::vector<uint8_t> snbprintf_to_vector(const char* fmt, T t)
+std::vector<uint8_t> snbprintf_to_vector(const char* fmt, ...)
 {
     std::vector<uint8_t> out(1024);
-    size_t written = snbprintf(out.data(), out.size(), fmt, t);
+    va_list args;
+    va_start(args, fmt);
+    size_t written = vsnbprintf(out.data(), out.size(), fmt, args);
+    va_end(args);
     out.resize(written);
     return out;
 }
@@ -138,4 +140,10 @@ TEST(bprintf, omits_width_and_precision)
 
     EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%8.8" PRIi32, int32_t(-42)));
     EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%159.159" PRIi32, int32_t(-42)));
+}
+
+TEST(bprintf, omits_verbatim_percent_sign)
+{
+    EXPECT_EQ(bytes(""), snbprintf_to_vector("%%"));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%%%" PRIi32 "%%", int32_t(-42)));
 }
