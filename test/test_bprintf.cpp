@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <uclog/bprintf.hpp>
+#include <inttypes.h>
 #include "bytes.hpp"
 
 using namespace testing;
@@ -112,4 +113,17 @@ TEST(bprintf, prints_string)
     size_t written = snbprintf(buf, 1024, "%s", "the string");
     EXPECT_EQ(11, written);
     EXPECT_EQ(bytes("the string\0"), bytes(buf, 11));
+}
+
+TEST(bprintf, omits_flags)
+{
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%-" PRIi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%+" PRIi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("% " PRIi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%#" PRIi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%0" PRIi32, int32_t(-42)));
+
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%-+" PRIi32, int32_t(-42)));
+
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%-+ #0" PRIi32, int32_t(-42)));
 }

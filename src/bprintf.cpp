@@ -29,7 +29,23 @@ static size_t arg_decode(const char* fmt, arg_spec* spec)
         return fmt - start;
     }
 
-    ++fmt;
+    for (bool found = true; found;)
+    {
+        ++fmt;
+
+        switch (*fmt)
+        {
+        case '-':
+        case '+':
+        case ' ':
+        case '#':
+        case '0':
+            break;
+        default:
+            found = false;
+            break;
+        }
+    }
 
     spec->type = 'd';
     if (*fmt == 'h' || *fmt == 'l')
