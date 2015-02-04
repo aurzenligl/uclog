@@ -3,13 +3,14 @@
 
 #include <cstddef>
 #include <cstdarg>
+#include <stdint.h>
 
 namespace uclog
 {
 
-int snbprintf(char* buf, size_t size, const char* fmt, ...);
+size_t snbprintf(uint8_t* buf, size_t size, const char* fmt, ...);
 
-int vsnbprintf(char* buf, size_t size, const char* fmt, va_list args);
+size_t vsnbprintf(uint8_t* buf, size_t size, const char* fmt, va_list args);
 
 } // namespace uclog
 

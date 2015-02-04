@@ -10,7 +10,7 @@ struct arg_spec
     char type; // one of: '\0', 'l', 'L', 'h', 'H', 'd'
 };
 
-static int arg_decode(const char* fmt, arg_spec* spec)
+static size_t arg_decode(const char* fmt, arg_spec* spec)
 {
     const char* start = fmt;
 
@@ -75,7 +75,7 @@ static int arg_decode(const char* fmt, arg_spec* spec)
     }
 }
 
-int vsnbprintf(char* buf, size_t size, const char* fmt, va_list args)
+size_t vsnbprintf(uint8_t* buf, size_t size, const char* fmt, va_list args)
 {
     /// 6.5.2.2/6 defines "default argument promotions",
     /// and /7 states that default argument promotions
@@ -100,8 +100,8 @@ do                                                      \
 } while (0)
 
     arg_spec spec = {0};
-    const char* start = buf;
-    const char* end = buf + size;
+    const uint8_t* start = buf;
+    const uint8_t* end = buf + size;
 
     while (*fmt)
     {
@@ -143,7 +143,7 @@ do                                                      \
     return buf - start;
 }
 
-int snbprintf(char* buf, size_t size, const char* fmt, ...)
+size_t snbprintf(uint8_t* buf, size_t size, const char* fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
