@@ -18,6 +18,31 @@ std::vector<uint8_t> snbprintf_to_vector(const char* fmt, T t)
     return out;
 }
 
+TEST(bprintf, prints_char)
+{
+    uint8_t buf[1024] = {0};
+    size_t written = snbprintf(buf, 1024, "%c", 42);
+    EXPECT_EQ(1, written);
+    EXPECT_EQ('\x2a', buf[0]);
+}
+
+TEST(bprintf, prints_pointer)
+{
+    uint8_t buf[1024] = {0};
+    void* ptr = buf + 999;
+    size_t written = snbprintf(buf, 1024, "%p", ptr);
+    EXPECT_EQ(sizeof(void*), written);
+    EXPECT_EQ(bytes(&ptr, sizeof(void*)), bytes(buf, sizeof(void*)));
+}
+
+TEST(bprintf, prints_string)
+{
+    uint8_t buf[1024] = {0};
+    size_t written = snbprintf(buf, 1024, "%s", "the string");
+    EXPECT_EQ(11, written);
+    EXPECT_EQ(bytes("the string\0"), bytes(buf, 11));
+}
+
 TEST(bprintf, prints_int)
 {
     char ref[] = "\xd6\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff";
@@ -90,31 +115,6 @@ TEST(bprintf, prints_other_float_codes)
     EXPECT_EQ(bytes("\x00\x00\x00\x00\x00\x00\x45\xc0"), snbprintf_to_vector("%lA", -42.));
 }
 
-TEST(bprintf, prints_char)
-{
-    uint8_t buf[1024] = {0};
-    size_t written = snbprintf(buf, 1024, "%c", 42);
-    EXPECT_EQ(1, written);
-    EXPECT_EQ('\x2a', buf[0]);
-}
-
-TEST(bprintf, prints_pointer)
-{
-    uint8_t buf[1024] = {0};
-    void* ptr = buf + 999;
-    size_t written = snbprintf(buf, 1024, "%p", ptr);
-    EXPECT_EQ(sizeof(void*), written);
-    EXPECT_EQ(bytes(&ptr, sizeof(void*)), bytes(buf, sizeof(void*)));
-}
-
-TEST(bprintf, prints_string)
-{
-    uint8_t buf[1024] = {0};
-    size_t written = snbprintf(buf, 1024, "%s", "the string");
-    EXPECT_EQ(11, written);
-    EXPECT_EQ(bytes("the string\0"), bytes(buf, 11));
-}
-
 TEST(bprintf, omits_flags)
 {
     EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%-" PRIi32, int32_t(-42)));
@@ -126,4 +126,16 @@ TEST(bprintf, omits_flags)
     EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%-+" PRIi32, int32_t(-42)));
 
     EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%-+ #0" PRIi32, int32_t(-42)));
+}
+
+TEST(bprintf, omits_width_and_precision)
+{
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%8" PRIi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%159" PRIi32, int32_t(-42)));
+
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%.8" PRIi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%.159" PRIi32, int32_t(-42)));
+
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%8.8" PRIi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%159.159" PRIi32, int32_t(-42)));
 }

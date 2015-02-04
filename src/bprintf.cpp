@@ -1,6 +1,7 @@
 #include <uclog/bprintf.hpp>
 #include <stdint.h>
 #include <cstring>
+#include <cctype>
 
 namespace uclog
 {
@@ -29,6 +30,7 @@ static size_t arg_decode(const char* fmt, arg_spec* spec)
         return fmt - start;
     }
 
+    // flags
     for (bool found = true; found;)
     {
         ++fmt;
@@ -44,6 +46,22 @@ static size_t arg_decode(const char* fmt, arg_spec* spec)
         default:
             found = false;
             break;
+        }
+    }
+
+    // width
+    while (isdigit(*fmt))
+    {
+        ++fmt;
+    }
+
+    // precision
+    if (*fmt == '.')
+    {
+        ++fmt;
+        while (isdigit(*fmt))
+        {
+            ++fmt;
         }
     }
 

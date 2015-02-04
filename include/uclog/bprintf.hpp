@@ -12,6 +12,7 @@ namespace uclog
  * Conversion specifiers %f %e %g %a are serialized as floats, %lf %le %lg %la as doubles.
  *
  * Not implemented:
+ * - * to dynamically specify width and precision
  * - %n conversion specifier
  * - long double formats
  */
