@@ -21,8 +21,8 @@ TEST(bprintf, prints_int)
 {
     char ref[] = "\xd6\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff";
 
-    EXPECT_EQ(bytes(&ref, 1), snbprintf_to_vector("%hhd", char(-42)));
-    EXPECT_EQ(bytes(&ref, sizeof(short)), snbprintf_to_vector("%hd", short(-42)));
+    EXPECT_EQ(bytes(&ref, 1), snbprintf_to_vector("%hhd", char(-42))); // char gets promoted to int anyway
+    EXPECT_EQ(bytes(&ref, sizeof(short)), snbprintf_to_vector("%hd", short(-42))); // short gets promoted to int anyway
     EXPECT_EQ(bytes(&ref, sizeof(int)), snbprintf_to_vector("%d", -42));
     EXPECT_EQ(bytes(&ref, sizeof(long)), snbprintf_to_vector("%ld", -42L));
     EXPECT_EQ(bytes(&ref, sizeof(long long)), snbprintf_to_vector("%lld", -42LL));
@@ -61,6 +61,32 @@ TEST(bprintf, prints_other_int_codes)
     EXPECT_EQ(bytes(&ref, sizeof(int)), snbprintf_to_vector("%X", -42));
     EXPECT_EQ(bytes(&ref, sizeof(long)), snbprintf_to_vector("%lX", -42L));
     EXPECT_EQ(bytes(&ref, sizeof(long long)), snbprintf_to_vector("%llX", -42LL));
+}
+
+TEST(bprintf, prints_float)
+{
+    EXPECT_EQ(bytes("\x00\x00\x28\xc2"), snbprintf_to_vector("%f", -42.f)); // float gets promoted to double anyway
+    EXPECT_EQ(bytes("\x00\x00\x28\xc2"), snbprintf_to_vector("%f", -42.));
+    EXPECT_EQ(bytes("\x00\x00\x00\x00\x00\x00\x45\xc0"), snbprintf_to_vector("%lf", -42.f)); // float gets promoted to double anyway
+    EXPECT_EQ(bytes("\x00\x00\x00\x00\x00\x00\x45\xc0"), snbprintf_to_vector("%lf", -42.));
+}
+
+TEST(bprintf, prints_other_float_codes)
+{
+    EXPECT_EQ(bytes("\x00\x00\x28\xc2"), snbprintf_to_vector("%e", -42.));
+    EXPECT_EQ(bytes("\x00\x00\x28\xc2"), snbprintf_to_vector("%g", -42.));
+    EXPECT_EQ(bytes("\x00\x00\x28\xc2"), snbprintf_to_vector("%a", -42.));
+    EXPECT_EQ(bytes("\x00\x00\x28\xc2"), snbprintf_to_vector("%F", -42.));
+    EXPECT_EQ(bytes("\x00\x00\x28\xc2"), snbprintf_to_vector("%E", -42.));
+    EXPECT_EQ(bytes("\x00\x00\x28\xc2"), snbprintf_to_vector("%G", -42.));
+    EXPECT_EQ(bytes("\x00\x00\x28\xc2"), snbprintf_to_vector("%A", -42.));
+    EXPECT_EQ(bytes("\x00\x00\x00\x00\x00\x00\x45\xc0"), snbprintf_to_vector("%le", -42.));
+    EXPECT_EQ(bytes("\x00\x00\x00\x00\x00\x00\x45\xc0"), snbprintf_to_vector("%lg", -42.));
+    EXPECT_EQ(bytes("\x00\x00\x00\x00\x00\x00\x45\xc0"), snbprintf_to_vector("%la", -42.));
+    EXPECT_EQ(bytes("\x00\x00\x00\x00\x00\x00\x45\xc0"), snbprintf_to_vector("%lF", -42.));
+    EXPECT_EQ(bytes("\x00\x00\x00\x00\x00\x00\x45\xc0"), snbprintf_to_vector("%lE", -42.));
+    EXPECT_EQ(bytes("\x00\x00\x00\x00\x00\x00\x45\xc0"), snbprintf_to_vector("%lG", -42.));
+    EXPECT_EQ(bytes("\x00\x00\x00\x00\x00\x00\x45\xc0"), snbprintf_to_vector("%lA", -42.));
 }
 
 TEST(bprintf, prints_char)

@@ -69,6 +69,19 @@ static size_t arg_decode(const char* fmt, arg_spec* spec)
     case 'u':
         // type of integer has already been determined
         return ++fmt - start;
+    case 'f':
+    case 'e':
+    case 'g':
+    case 'a':
+    case 'F':
+    case 'E':
+    case 'G':
+    case 'A':
+        // slight deviation from standard:
+        // %f treated as float, %lf as double,
+        // like in scanf functions
+        spec->type = (spec->type == 'l') ? 'F' : 'f';
+        return ++fmt - start;
     default:
         spec->type = 0;
         return fmt - start;
@@ -92,6 +105,17 @@ do                                                      \
     {                                                   \
         value = va_arg(args, int);                      \
     }                                                   \
+    if (buf + sizeof(type) <= end)                      \
+    {                                                   \
+        memcpy(buf, &value, sizeof(type));              \
+        buf += sizeof(type);                            \
+    }                                                   \
+} while (0)
+
+#define save_float_arg(type)                            \
+do                                                      \
+{                                                       \
+    type value = va_arg(args, double);                  \
     if (buf + sizeof(type) <= end)                      \
     {                                                   \
         memcpy(buf, &value, sizeof(type));              \
@@ -126,6 +150,12 @@ do                                                      \
         case 'd':
             save_arg(int);
             break;
+        case 'f':
+            save_float_arg(float);
+            break;
+        case 'F':
+            save_float_arg(double);
+            break;
         case 'p':
             save_arg(uintptr_t);
             break;
@@ -141,6 +171,8 @@ do                                                      \
     }
 
     return buf - start;
+#undef save_arg
+#undef save_float_arg
 }
 
 size_t snbprintf(uint8_t* buf, size_t size, const char* fmt, ...)
