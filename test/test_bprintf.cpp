@@ -7,11 +7,23 @@ using namespace testing;
 using namespace uclog;
 
 // *** WARNING ***
-// these tests will work only on little endian machines
+// 1. these tests will work only on little endian machines
+// 2. SCN scanf macros used since they differentiate between i8, i16, i32
 
 std::vector<uint8_t> snbprintf_to_vector(const char* fmt, ...)
 {
     std::vector<uint8_t> out(1024);
+    va_list args;
+    va_start(args, fmt);
+    size_t written = vsnbprintf(out.data(), out.size(), fmt, args);
+    va_end(args);
+    out.resize(written);
+    return out;
+}
+
+std::vector<uint8_t> snbprintf_to_limited_vector(size_t limit, const char* fmt, ...)
+{
+    std::vector<uint8_t> out(limit);
     va_list args;
     va_start(args, fmt);
     size_t written = vsnbprintf(out.data(), out.size(), fmt, args);
@@ -28,11 +40,6 @@ TEST(bprintf, handles_empty_fmt)
 TEST(bprintf, handles_fmt_without_conversion_specifiers)
 {
     EXPECT_EQ(bytes(""), snbprintf_to_vector("qwertyuiop[]asdfghjkl;'zxcvbnm,./1234567890-=!@#$^&*()_+ "));
-}
-
-TEST(bprintf, handles_invalid_percent_sign_usage_gracefully)
-{
-    EXPECT_EQ(bytes(""), snbprintf_to_vector("#$%^&"));
 }
 
 TEST(bprintf, prints_char)
@@ -134,31 +141,78 @@ TEST(bprintf, prints_other_float_codes)
 
 TEST(bprintf, omits_flags)
 {
-    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%-" PRIi32, int32_t(-42)));
-    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%+" PRIi32, int32_t(-42)));
-    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("% " PRIi32, int32_t(-42)));
-    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%#" PRIi32, int32_t(-42)));
-    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%0" PRIi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%-" SCNi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%+" SCNi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("% " SCNi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%#" SCNi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%0" SCNi32, int32_t(-42)));
 
-    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%-+" PRIi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%-+" SCNi32, int32_t(-42)));
 
-    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%-+ #0" PRIi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%-+ #0" SCNi32, int32_t(-42)));
 }
 
 TEST(bprintf, omits_width_and_precision)
 {
-    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%8" PRIi32, int32_t(-42)));
-    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%159" PRIi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%8" SCNi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%159" SCNi32, int32_t(-42)));
 
-    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%.8" PRIi32, int32_t(-42)));
-    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%.159" PRIi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%.8" SCNi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%.159" SCNi32, int32_t(-42)));
 
-    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%8.8" PRIi32, int32_t(-42)));
-    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%159.159" PRIi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%8.8" SCNi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%159.159" SCNi32, int32_t(-42)));
 }
 
 TEST(bprintf, omits_verbatim_percent_sign)
 {
     EXPECT_EQ(bytes(""), snbprintf_to_vector("%%"));
-    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%%%" PRIi32 "%%", int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_vector("%%%" SCNi32 "%%", int32_t(-42)));
+}
+
+TEST(bprintf, handles_invalid_percent_sign_usage_gracefully)
+{
+    EXPECT_EQ(bytes(""), snbprintf_to_vector("#$%^&"));
+}
+
+TEST(bprintf, handles_overflow_int_gracefully)
+{
+    EXPECT_EQ(bytes(""), snbprintf_to_limited_vector(0, "%" SCNi32, int32_t(-42)));
+    EXPECT_EQ(bytes(""), snbprintf_to_limited_vector(1, "%" SCNi32, int32_t(-42)));
+    EXPECT_EQ(bytes(""), snbprintf_to_limited_vector(2, "%" SCNi32, int32_t(-42)));
+    EXPECT_EQ(bytes(""), snbprintf_to_limited_vector(3, "%" SCNi32, int32_t(-42)));
+    EXPECT_EQ(bytes("\xd6\xff\xff\xff"), snbprintf_to_limited_vector(4, "%" SCNi32, int32_t(-42)));
+}
+
+TEST(bprintf, handles_overflow_string_gracefully)
+{
+    EXPECT_EQ(bytes(""), snbprintf_to_limited_vector(0, "%s", "abcd"));
+    EXPECT_EQ(bytes(""), snbprintf_to_limited_vector(4, "%s", "abcd"));
+    EXPECT_EQ(bytes("abcd\x00"), snbprintf_to_limited_vector(5, "%s", "abcd"));
+}
+
+TEST(bprintf, prints_multiple_arguments)
+{
+    EXPECT_EQ(
+        bytes("\xd6\xff\xff\xff\xd6\xff\xff\xff\xd6\xff\xff\xff"),
+        snbprintf_to_vector("%" SCNi32 "%" SCNi32 "%" SCNi32, int32_t(-42), int32_t(-42), int32_t(-42))
+    );
+}
+
+TEST(bprintf, prints_heterogenous_arguments)
+{
+    EXPECT_EQ(
+        bytes(
+            "\xd6\xff\xff\xff"
+            "\xd6\xff"
+            "\xd6"
+            "abcd\x00"
+            "\x00\x00\x28\xc2"
+            "\x00\x00\x00\x00\x00\x00\x45\xc0"
+        ),
+        snbprintf_to_vector(
+            "i32 %" SCNi32 " i16 %" SCNi16 " i8 %" SCNi8 " string %s float %f double %lf",
+            int32_t(-42), int32_t(-42), int32_t(-42), "abcd", -42., -42.
+        )
+    );
 }

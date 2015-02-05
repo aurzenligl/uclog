@@ -211,11 +211,12 @@ do                                                      \
         case arg_type_string:
             {
                 const char* str = va_arg(args, const char*);
-                while (*str && (buf < end))
+                size_t len = strlen(str) + 1;
+                if (buf + len <= end)
                 {
-                    *buf++ = *str++;
+                    memcpy(buf, str, len);
+                    buf += len;
                 }
-                *buf++ = 0;
                 break;
             }
         }
