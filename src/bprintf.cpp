@@ -6,16 +6,30 @@
 namespace uclog
 {
 
+enum arg_type
+{
+    arg_type_none,
+    arg_type_char,
+    arg_type_short,
+    arg_type_int,
+    arg_type_long,
+    arg_type_long_long,
+    arg_type_pointer,
+    arg_type_string,
+    arg_type_float,
+    arg_type_double
+};
+
 struct arg_spec
 {
-    char type; // one of: '\0', 'l', 'L', 'h', 'H', 'd'
+    arg_type type;
 };
 
 static size_t arg_decode(const char* fmt, arg_spec* spec)
 {
     const char* start = fmt;
 
-    spec->type = 0;
+    spec->type = arg_type_none;
 
     for (; *fmt ; ++fmt)
     {
@@ -65,35 +79,31 @@ static size_t arg_decode(const char* fmt, arg_spec* spec)
         }
     }
 
-    spec->type = 'd';
+    spec->type = arg_type_int;
     if (*fmt == 'h' || *fmt == 'l')
     {
-        spec->type = *fmt++;
-        if (spec->type == *fmt)
+        char qualifier = *fmt++;
+        if (qualifier == *fmt)
         {
-            if (spec->type == 'l')
-            {
-                spec->type = 'L';
-                ++fmt;
-            }
-            else if (spec->type == 'h')
-            {
-                spec->type = 'H';
-                ++fmt;
-            }
+            spec->type = (qualifier == 'h') ? arg_type_char : arg_type_long_long;
+            ++fmt;
+        }
+        else
+        {
+            spec->type = (qualifier == 'h') ? arg_type_short : arg_type_long;
         }
     }
 
     switch (*fmt)
     {
     case 'c':
-        spec->type = 'H';
+        spec->type = arg_type_char;
         return ++fmt - start;
     case 's':
-        spec->type = 's';
+        spec->type = arg_type_string;
         return ++fmt - start;
     case 'p':
-        spec->type = 'p';
+        spec->type = arg_type_pointer;
         return ++fmt - start;
     case 'o':
     case 'x':
@@ -114,13 +124,13 @@ static size_t arg_decode(const char* fmt, arg_spec* spec)
         // slight deviation from standard:
         // %f treated as float, %lf as double,
         // like in scanf functions
-        spec->type = (spec->type == 'l') ? 'F' : 'f';
+        spec->type = (spec->type == arg_type_long) ? arg_type_double : arg_type_float;
         return ++fmt - start;
     case '%':
-        spec->type = 0;
+        spec->type = arg_type_none;
         return ++fmt - start;
     default:
-        spec->type = 0;
+        spec->type = arg_type_none;
         return fmt - start;
     }
 }
@@ -160,7 +170,7 @@ do                                                      \
     }                                                   \
 } while (0)
 
-    arg_spec spec = {0};
+    arg_spec spec = { arg_type_none };
     const uint8_t* start = buf;
     const uint8_t* end = buf + size;
 
@@ -172,38 +182,42 @@ do                                                      \
 
         switch (spec.type)
         {
-        case 'L':
-            save_arg(long long);
+        case arg_type_none:
             break;
-        case 'l':
-            save_arg(long);
-            break;
-        case 'H':
+        case arg_type_char:
             save_arg(char);
             break;
-        case 'h':
+        case arg_type_short:
             save_arg(short);
             break;
-        case 'd':
+        case arg_type_int:
             save_arg(int);
             break;
-        case 'f':
+        case arg_type_long:
+            save_arg(long);
+            break;
+        case arg_type_long_long:
+            save_arg(long long);
+            break;
+        case arg_type_float:
             save_float_arg(float);
             break;
-        case 'F':
+        case arg_type_double:
             save_float_arg(double);
             break;
-        case 'p':
+        case arg_type_pointer:
             save_arg(uintptr_t);
             break;
-        case 's':
-            const char* str = va_arg(args, const char*);
-            while (*str && (buf < end))
+        case arg_type_string:
             {
-                *buf++ = *str++;
+                const char* str = va_arg(args, const char*);
+                while (*str && (buf < end))
+                {
+                    *buf++ = *str++;
+                }
+                *buf++ = 0;
+                break;
             }
-            *buf++ = 0;
-            break;
         }
     }
 
