@@ -137,9 +137,8 @@ static size_t arg_decode(const char* fmt, arg_spec* spec)
 
 size_t vsnbprintf(uint8_t* buf, size_t size, const char* fmt, va_list args)
 {
-    /// 6.5.2.2/6 defines "default argument promotions",
-    /// and /7 states that default argument promotions
-    /// are applied to "trailing arguments", that is varargs denoted by ....
+    /// due to "default argument promotions" as described in 6.5.2.2/6,
+    /// char and short arguments are promoted to int
 #define save_arg(type)                                  \
 do                                                      \
 {                                                       \
@@ -159,6 +158,8 @@ do                                                      \
     }                                                   \
 } while (0)
 
+    /// due to "default argument promotions" as described in 6.5.2.2/6,
+    /// float is promoted to double
 #define save_float_arg(type)                            \
 do                                                      \
 {                                                       \
