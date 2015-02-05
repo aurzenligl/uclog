@@ -20,6 +20,21 @@ std::vector<uint8_t> snbprintf_to_vector(const char* fmt, ...)
     return out;
 }
 
+TEST(bprintf, handles_empty_fmt)
+{
+    EXPECT_EQ(bytes(""), snbprintf_to_vector(""));
+}
+
+TEST(bprintf, handles_fmt_without_conversion_specifiers)
+{
+    EXPECT_EQ(bytes(""), snbprintf_to_vector("qwertyuiop[]asdfghjkl;'zxcvbnm,./1234567890-=!@#$^&*()_+ "));
+}
+
+TEST(bprintf, handles_invalid_percent_sign_usage_gracefully)
+{
+    EXPECT_EQ(bytes(""), snbprintf_to_vector("#$%^&"));
+}
+
 TEST(bprintf, prints_char)
 {
     uint8_t buf[1024] = {0};
