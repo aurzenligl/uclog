@@ -19,7 +19,7 @@ def build(ctx):
     ctx(features = 'cxx cxxprogram test',
         target = 'test_uclog',
         source = ctx.path.ant_glob('test/*.cpp'),
-        cxxflags = '-g -Wall',
+        cxxflags = '-g -Wall -std=c++11',
         lib = 'gtest pthread',
         use = 'uclog')
 

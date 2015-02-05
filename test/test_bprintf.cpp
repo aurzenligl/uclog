@@ -10,26 +10,19 @@ using namespace uclog;
 // 1. these tests will work only on little endian machines
 // 2. SCN scanf macros used since they differentiate between i8, i16, i32
 
-std::vector<uint8_t> snbprintf_to_vector(const char* fmt, ...)
+template <typename... Ts>
+std::vector<uint8_t> snbprintf_to_limited_vector(size_t limit, const char* fmt, Ts... vs)
 {
-    std::vector<uint8_t> out(1024);
-    va_list args;
-    va_start(args, fmt);
-    size_t written = vsnbprintf(out.data(), out.size(), fmt, args);
-    va_end(args);
+    std::vector<uint8_t> out(limit);
+    size_t written = snbprintf(out.data(), out.size(), fmt, vs...);
     out.resize(written);
     return out;
 }
 
-std::vector<uint8_t> snbprintf_to_limited_vector(size_t limit, const char* fmt, ...)
+template <typename... Ts>
+std::vector<uint8_t> snbprintf_to_vector(const char* fmt, Ts... vs)
 {
-    std::vector<uint8_t> out(limit);
-    va_list args;
-    va_start(args, fmt);
-    size_t written = vsnbprintf(out.data(), out.size(), fmt, args);
-    va_end(args);
-    out.resize(written);
-    return out;
+    return snbprintf_to_limited_vector(1024, fmt, vs...);
 }
 
 TEST(bprintf, handles_empty_fmt)
