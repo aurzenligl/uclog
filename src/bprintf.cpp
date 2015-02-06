@@ -233,9 +233,9 @@ size_t snbprintf(void* buf, size_t size, const char* fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    size_t read = vsnbprintf(buf, size, fmt, args);
+    size_t written = vsnbprintf(buf, size, fmt, args);
     va_end(args);
-    return read;
+    return written;
 }
 
 } // namespace uclog
