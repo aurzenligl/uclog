@@ -1,6 +1,5 @@
 #include <cstdio>
 #include <ctime>
-#include <vector>
 #include <uclog/bprintf.hpp>
 
 enum { N = 1024 * 128 };
@@ -123,7 +122,7 @@ struct test_many_ints
 
 int main()
 {
-    std::vector<test_result> results = {
+    test_result results[] = {
         test<test_fmt>("test_fmt"),
         test<test_strings>("test_strings"),
         test<test_int>("test_int"),
