@@ -44,38 +44,17 @@ static size_t arg_decode(const char* fmt, arg_spec* spec)
         return fmt - start;
     }
 
-    // flags
-    for (bool found = true; found;)
+    ++fmt;
+    if (*fmt == '%')
     {
-        ++fmt;
-
-        switch (*fmt)
-        {
-        case '-':
-        case '+':
-        case ' ':
-        case '#':
-        case '0':
-            break;
-        default:
-            found = false;
-            break;
-        }
+        return fmt - start;
     }
 
-    // width
-    while (isdigit(*fmt))
+    for (; *fmt; ++fmt)
     {
-        ++fmt;
-    }
-
-    // precision
-    if (*fmt == '.')
-    {
-        ++fmt;
-        while (isdigit(*fmt))
+        if (((*fmt >= 'a') && (*fmt <= 'z')) || ((*fmt >= 'A') && (*fmt <= 'Z')))
         {
-            ++fmt;
+            break;
         }
     }
 
@@ -125,9 +104,6 @@ static size_t arg_decode(const char* fmt, arg_spec* spec)
         // %f treated as float, %lf as double,
         // like in scanf functions
         spec->type = (spec->type == arg_type_long) ? arg_type_double : arg_type_float;
-        return ++fmt - start;
-    case '%':
-        spec->type = arg_type_none;
         return ++fmt - start;
     default:
         spec->type = arg_type_none;
