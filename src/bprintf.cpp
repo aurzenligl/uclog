@@ -135,7 +135,7 @@ static size_t arg_decode(const char* fmt, arg_spec* spec)
     }
 }
 
-size_t vsnbprintf(uint8_t* buf, size_t size, const char* fmt, va_list args)
+size_t vsnbprintf(void* buf, size_t size, const char* fmt, va_list args)
 {
     /// due to "default argument promotions" as described in 6.5.2.2/6,
     /// char and short arguments are promoted to int
@@ -151,10 +151,10 @@ do                                                      \
     {                                                   \
         value = va_arg(args, int);                      \
     }                                                   \
-    if (buf + sizeof(type) <= end)                      \
+    if (cur + sizeof(type) <= end)                      \
     {                                                   \
-        memcpy(buf, &value, sizeof(type));              \
-        buf += sizeof(type);                            \
+        memcpy(cur, &value, sizeof(type));              \
+        cur += sizeof(type);                            \
     }                                                   \
 } while (0)
 
@@ -164,16 +164,17 @@ do                                                      \
 do                                                      \
 {                                                       \
     type value = va_arg(args, double);                  \
-    if (buf + sizeof(type) <= end)                      \
+    if (cur + sizeof(type) <= end)                      \
     {                                                   \
-        memcpy(buf, &value, sizeof(type));              \
-        buf += sizeof(type);                            \
+        memcpy(cur, &value, sizeof(type));              \
+        cur += sizeof(type);                            \
     }                                                   \
 } while (0)
 
     arg_spec spec = { arg_type_none };
-    const uint8_t* start = buf;
-    const uint8_t* end = buf + size;
+    const uint8_t* start = static_cast<const uint8_t*>(buf);
+    const uint8_t* end = static_cast<const uint8_t*>(buf) + size;
+    uint8_t* cur = static_cast<uint8_t*>(buf);
 
     while (*fmt)
     {
@@ -213,22 +214,22 @@ do                                                      \
             {
                 const char* str = va_arg(args, const char*);
                 size_t len = strlen(str) + 1;
-                if (buf + len <= end)
+                if (cur + len <= end)
                 {
-                    memcpy(buf, str, len);
-                    buf += len;
+                    memcpy(cur, str, len);
+                    cur += len;
                 }
                 break;
             }
         }
     }
 
-    return buf - start;
+    return cur - start;
 #undef save_arg
 #undef save_float_arg
 }
 
-size_t snbprintf(uint8_t* buf, size_t size, const char* fmt, ...)
+size_t snbprintf(void* buf, size_t size, const char* fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
