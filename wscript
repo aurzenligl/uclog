@@ -14,7 +14,7 @@ def build(ctx):
         includes = 'include',
         export_includes = 'include',
         source = ctx.path.ant_glob('src/*.cpp'),
-        cxxflags = '-g -Wall')
+        cxxflags = '-g -Wall -O3')
 
     ctx(features = 'cxx cxxprogram test',
         target = 'test_uclog',
@@ -23,5 +23,16 @@ def build(ctx):
         lib = 'gtest pthread',
         use = 'uclog')
 
+    ctx(features = 'cxx cxxprogram',
+        target = 'perftest',
+        source = ctx.path.ant_glob('test/perf/*.cpp'),
+        cxxflags = '-g -Wall -O3',
+        use = 'uclog')
+
     ctx.add_post_fun(waf_unit_test.summary)
     ctx.add_post_fun(waf_unit_test.set_exit_code)
+
+def perf(ctx):
+    import os
+    import waflib
+    os.system(waflib.Context.out_dir + '/perftest')
