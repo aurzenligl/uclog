@@ -26,7 +26,7 @@ def build(ctx):
     ctx(features = 'cxx cxxprogram',
         target = 'perftest',
         source = ctx.path.ant_glob('test/perf/*.cpp'),
-        cxxflags = '-g -Wall -O3',
+        cxxflags = '-g -Wall -O3 -std=c++11',
         use = 'uclog')
 
     ctx.add_post_fun(waf_unit_test.summary)
