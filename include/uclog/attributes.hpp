@@ -16,8 +16,13 @@ enum level_t
 
 struct logger_info
 {
-    int id;
+    logger_info(): name(""), id()
+    { }
+    logger_info(const char* name, int id): name(name), id(id)
+    { }
+
     const char* name;
+    int id;
 };
 
 } // namespace uclog

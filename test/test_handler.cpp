@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <uclog/handler.hpp>
-#include "bytes.hpp"
 
 using namespace testing;
 using namespace uclog;
@@ -44,7 +43,7 @@ static void log(handler& handler, const logger_info& logger, level_t level, cons
 TEST(handler, logs_when_level_not_set)
 {
     test_storage storage;
-    logger_info info = {0};
+    logger_info info;
     handler h(storage);
 
     log(h, info, level_debug, "test %d", 42);
@@ -55,7 +54,7 @@ TEST(handler, logs_when_level_not_set)
 TEST(handler, logs_when_level_not_lower)
 {
     test_storage storage;
-    logger_info info = {0};
+    logger_info info;
     handler h(storage, level_warning);
 
     log(h, info, level_debug, "a");
