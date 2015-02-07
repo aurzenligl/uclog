@@ -6,14 +6,18 @@ namespace uclog
 void logger::log(level_t level, const char* fmt, ...)
 {
     va_list src_args;
-    typedef std::vector<handler*>::iterator iterator;
-    for (iterator handler = handlers_.begin(); handler != handlers_.end(); ++handler)
+
+    for (logger* lgr = this; lgr; lgr = propagate_ ? lgr->parent_ : 0)
     {
-        va_list args;
-        va_copy(src_args, args);
-        va_start(args, fmt);
-        (*handler)->log(info_, level, fmt, args);
-        va_end(args);
+        typedef std::vector<handler*>::iterator iterator;
+        for (iterator handler = lgr->handlers_.begin(); handler != lgr->handlers_.end(); ++handler)
+        {
+            va_list args;
+            va_copy(src_args, args);
+            va_start(args, fmt);
+            (*handler)->log(info_, level, fmt, args);
+            va_end(args);
+        }
     }
 }
 

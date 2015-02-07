@@ -42,7 +42,7 @@ TEST(logger, sets_level)
     EXPECT_EQ(level_info, lgr.level());
 }
 
-TEST(logger, logs)
+TEST(logger, logs_to_single_handler)
 {
     fake_storage storage;
     handler h(storage);
@@ -52,4 +52,18 @@ TEST(logger, logs)
     lgr.log(level_warning, "test %d", 42);
 
     EXPECT_EQ("test 42", storage.data);
+}
+
+TEST(logger, logs_to_multiple_handlers)
+{
+    fake_storage storage;
+    handler h1(storage);
+    handler h2(storage);
+    logger lgr(test_info, level_warning);
+    lgr.add_handler(h1);
+    lgr.add_handler(h2);
+
+    lgr.log(level_warning, "test %d ", 42);
+
+    EXPECT_EQ("test 42 test 42 ", storage.data);
 }
