@@ -31,7 +31,12 @@ public:
     }
 
     void log(const logger_info& logger, level_t level, const char* fmt, va_list args)
-    { }
+    {
+        if (level >= level_)
+        {
+            storage_->store(logger, level, fmt, args);
+        }
+    }
 
 private:
     storage* storage_;
