@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <uclog/handler.hpp>
+#include "fake_storage.hpp"
 
 using namespace testing;
 using namespace uclog;
@@ -20,18 +21,6 @@ TEST(handler, sets_level)
     EXPECT_EQ(level_info, h.level());
 }
 
-struct test_storage : public storage
-{
-    virtual void store(const logger_info& logger, level_t level, const char* fmt, va_list args)
-    {
-        char buf[1024];
-        int size = vsnprintf(buf, 1024, fmt, args);
-        data.insert(data.end(), buf, buf + size);
-    }
-
-    std::string data;
-};
-
 static void log(handler& handler, const logger_info& logger, level_t level, const char* fmt, ...)
 {
     va_list args;
@@ -42,7 +31,7 @@ static void log(handler& handler, const logger_info& logger, level_t level, cons
 
 TEST(handler, logs_when_level_not_set)
 {
-    test_storage storage;
+    fake_storage storage;
     logger_info info;
     handler h(storage);
 
@@ -53,7 +42,7 @@ TEST(handler, logs_when_level_not_set)
 
 TEST(handler, logs_when_level_not_lower)
 {
-    test_storage storage;
+    fake_storage storage;
     logger_info info;
     handler h(storage, level_warning);
 
