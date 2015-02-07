@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <uclog/logger.hpp>
+#include "fake_storage.hpp"
 
 using namespace testing;
 using namespace uclog;
@@ -39,4 +40,16 @@ TEST(logger, sets_level)
     logger lgr;
     lgr.set_level(level_info);
     EXPECT_EQ(level_info, lgr.level());
+}
+
+TEST(logger, logs)
+{
+    fake_storage storage;
+    handler h(storage);
+    logger lgr(test_info, level_warning);
+    lgr.add_handler(h);
+
+    lgr.log(level_warning, "test %d", 42);
+
+    EXPECT_EQ("test 42", storage.data);
 }

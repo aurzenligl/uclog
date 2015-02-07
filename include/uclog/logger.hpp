@@ -51,8 +51,12 @@ public:
         level_ = level;
     }
 
-    void log(level_t level, const char* fmt, ...)
-    { }
+    void add_handler(handler& handler)
+    {
+        handlers_.push_back(&handler);
+    }
+
+    void log(level_t level, const char* fmt, ...);
 
 private:
     std::vector<handler*> handlers_;
