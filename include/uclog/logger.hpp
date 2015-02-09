@@ -46,9 +46,19 @@ public:
         return info_.id;
     }
 
+    bool propagate() const
+    {
+        return propagate_;
+    }
+
     void set_level(level_t level)
     {
         level_ = level;
+    }
+
+    void set_propagate(bool value)
+    {
+        propagate_ = value;
     }
 
     void add_handler(handler& handler)
