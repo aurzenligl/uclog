@@ -35,11 +35,29 @@ TEST(logger, initializes_info)
     EXPECT_EQ(42, logger(test_info, level_warning).id());
 }
 
+TEST(logger, initializes_propagate)
+{
+    logger fake_parent;
+
+    EXPECT_EQ(true, logger().propagate());
+    EXPECT_EQ(true, logger(test_info).propagate());
+    EXPECT_EQ(true, logger(test_info, fake_parent).propagate());
+    EXPECT_EQ(true, logger(test_info, fake_parent, level_warning).propagate());
+    EXPECT_EQ(true, logger(test_info, level_warning).propagate());
+}
+
 TEST(logger, sets_level)
 {
     logger lgr;
     lgr.set_level(level_info);
     EXPECT_EQ(level_info, lgr.level());
+}
+
+TEST(logger, sets_propagate)
+{
+    logger lgr;
+    lgr.set_propagate(false);
+    EXPECT_EQ(false, lgr.propagate());
 }
 
 TEST(logger, logs_to_single_handler)
