@@ -13,6 +13,13 @@ struct fake_storage : public uclog::storage
         data.insert(data.end(), buf, buf + size);
     }
 
+    std::string read_and_clear()
+    {
+        std::string out;
+        out.swap(data);
+        return out;
+    }
+
     std::string data;
 };
 

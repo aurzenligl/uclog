@@ -144,3 +144,22 @@ TEST(logger, propagates_to_multiple_parents_handlers_even_if_parents_do_not_prop
 
     EXPECT_EQ("test 42 test 42 ", storage.data);
 }
+
+TEST(logger, logs_when_level_not_lower_than_loggers)
+{
+    fake_storage storage;
+    handler h(storage);
+    logger lgr(test_info, level_warning);
+    lgr.add_handler(h);
+
+    lgr.log(level_debug, "test %d ", 42);
+    EXPECT_EQ("", storage.read_and_clear());
+    lgr.log(level_info, "test %d ", 42);
+    EXPECT_EQ("", storage.read_and_clear());
+    lgr.log(level_warning, "test %d ", 42);
+    EXPECT_EQ("test 42 ", storage.read_and_clear());
+    lgr.log(level_error, "test %d ", 42);
+    EXPECT_EQ("test 42 ", storage.read_and_clear());
+    lgr.log(level_critical, "test %d ", 42);
+    EXPECT_EQ("test 42 ", storage.read_and_clear());
+}
