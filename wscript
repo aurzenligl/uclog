@@ -4,7 +4,9 @@ from waflib import Options, Tools
 
 def options(ctx):
     ctx.load('compiler_cxx waf_unit_test')
-    ctx.add_option('--perf', action='store_true', help='Run bprintf performance test.')
+    ctx.add_option('--perf', action='store_true', help='Run all performance tests.')
+    ctx.add_option('--perfbprintf', action='store_true', help='Run bprintf performance test.')
+    ctx.add_option('--perflogger', action='store_true', help='Run logger performance test.')
 
 def configure(ctx):
     ctx.load('compiler_cxx waf_unit_test')
@@ -25,15 +27,25 @@ def build(ctx):
         use = 'uclog')
 
     ctx(features = 'cxx cxxprogram',
-        target = 'perftest',
-        source = ctx.path.ant_glob('test/perf/*.cpp'),
+        target = 'testperfbprintf',
+        source = ctx.path.ant_glob('test/perf/bprintf.cpp'),
+        cxxflags = '-g -Wall -O3 -std=c++11',
+        use = 'uclog')
+
+    ctx(features = 'cxx cxxprogram',
+        target = 'testperflogger',
+        source = ctx.path.ant_glob('test/perf/logger.cpp'),
         cxxflags = '-g -Wall -O3 -std=c++11',
         use = 'uclog')
 
     ctx.add_post_fun(Tools.waf_unit_test.summary)
     ctx.add_post_fun(Tools.waf_unit_test.set_exit_code)
 
-    if getattr(Options.options, 'perf'):
+    if getattr(Options.options, 'perfbprintf') or getattr(Options.options, 'perf'):
         ctx(rule = lambda task: os.system(task.inputs[0].abspath()),
-            source = 'perftest',
+            source = 'testperfbprintf',
+            always = True)
+    if getattr(Options.options, 'perflogger') or getattr(Options.options, 'perf'):
+        ctx(rule = lambda task: os.system(task.inputs[0].abspath()),
+            source = 'testperflogger',
             always = True)
