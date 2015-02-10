@@ -3,9 +3,22 @@
 namespace uclog
 {
 
+static level_t get_effective_level(logger* lgr)
+{
+    for (; lgr; lgr = lgr->parent())
+    {
+        if (lgr->level() != level_not_set)
+        {
+            return lgr->level();
+        }
+    }
+    return level_not_set;
+}
+
 void logger::log(level_t level, const char* fmt, ...)
 {
-    if (level < level_)
+    level_t effective_level = get_effective_level(this);
+    if (effective_level == level_not_set || level < effective_level)
     {
         return;
     }

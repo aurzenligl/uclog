@@ -145,7 +145,7 @@ TEST(logger, propagates_to_multiple_parents_handlers_even_if_parents_do_not_prop
     EXPECT_EQ("test 42 test 42 ", storage.data);
 }
 
-TEST(logger, logs_when_level_not_lower_than_loggers)
+TEST(logger, filters_when_level_lower)
 {
     fake_storage storage;
     handler h(storage);
@@ -162,4 +162,32 @@ TEST(logger, logs_when_level_not_lower_than_loggers)
     EXPECT_EQ("test 42 ", storage.read_and_clear());
     lgr.log(level_critical, "test %d ", 42);
     EXPECT_EQ("test 42 ", storage.read_and_clear());
+}
+
+TEST(logger, filters_with_parent_level_when_not_set)
+{
+    fake_storage storage;
+    handler h(storage);
+    logger lgr1(test_info, level_warning);
+    logger lgr2(test_info, lgr1);
+    logger lgr3(test_info, lgr2);
+    lgr1.add_handler(h);
+
+    lgr3.log(level_info, "test %d ", 42);
+    EXPECT_EQ("", storage.read_and_clear());
+    lgr3.log(level_warning, "test %d ", 42);
+    EXPECT_EQ("test 42 ", storage.read_and_clear());
+}
+
+TEST(logger, filters_when_level_not_set)
+{
+    fake_storage storage;
+    handler h(storage);
+    logger lgr(test_info);
+    lgr.add_handler(h);
+
+    lgr.log(level_debug, "test %d ", 42);
+    EXPECT_EQ("", storage.read_and_clear());
+    lgr.log(level_critical, "test %d ", 42);
+    EXPECT_EQ("", storage.read_and_clear());
 }

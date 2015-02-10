@@ -51,6 +51,11 @@ public:
         return propagate_;
     }
 
+    logger* parent()
+    {
+        return parent_;
+    }
+
     void set_level(level_t level)
     {
         level_ = level;
