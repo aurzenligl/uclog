@@ -2,8 +2,8 @@
 #define UCLOG_HANDLER_HPP_
 
 #include <cstdarg>
-#include <uclog/attributes.hpp>
 #include <uclog/storage.hpp>
+#include <uclog/level.hpp>
 
 namespace uclog
 {
@@ -30,11 +30,11 @@ public:
         level_ = level;
     }
 
-    void log(const logger_info& logger, level_t level, const char* fmt, va_list args)
+    void log(level_t level, const char* fmt, va_list args)
     {
         if (level >= level_)
         {
-            storage_->store(logger, level, fmt, args);
+            storage_->store(level, fmt, args);
         }
     }
 

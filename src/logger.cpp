@@ -18,7 +18,7 @@ void logger::log(level_t level, const char* fmt, ...)
     {
         va_list args;
         va_copy(args, src_args);
-        (*handler)->log(info_, level, fmt, args);
+        (*handler)->log(level, fmt, args);
         va_end(args);
     }
     va_end(src_args);

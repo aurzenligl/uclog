@@ -3,9 +3,9 @@
 
 #include <cstdarg>
 #include <vector>
-#include <uclog/attributes.hpp>
 #include <uclog/handler.hpp>
 #include <uclog/site.hpp>
+#include <uclog/level.hpp>
 
 namespace uclog
 {
@@ -13,30 +13,15 @@ namespace uclog
 class logger
 {
 public:
-    logger(): info_(), level_(level_debug)
+    logger(): level_(level_debug)
     { }
 
-    explicit logger(const logger_info& info)
-        : info_(info), level_(level_debug)
-    { }
-
-    logger(const logger_info& info, level_t level)
-        : info_(info), level_(level)
+    explicit logger(level_t level): level_(level)
     { }
 
     level_t level() const
     {
         return level_;
-    }
-
-    const char* name() const
-    {
-        return info_.name;
-    }
-
-    int id() const
-    {
-        return info_.id;
     }
 
     void set_level(level_t level)
@@ -53,7 +38,6 @@ public:
 
 private:
     std::vector<handler*> handlers_;
-    logger_info info_;
     level_t level_;
 };
 

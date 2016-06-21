@@ -2,15 +2,14 @@
 #define UCLOG_STORAGE_HPP_
 
 #include <cstdarg>
-#include <uclog/attributes.hpp>
+#include <uclog/level.hpp>
 
 namespace uclog
 {
 
 struct storage
 {
-    virtual ~storage() { }
-    virtual void store(const logger_info& logger, level_t level, const char* fmt, va_list args) = 0;
+    virtual void store(level_t level, const char* fmt, va_list args) = 0;
 };
 
 } // namespace uclog

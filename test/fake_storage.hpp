@@ -6,7 +6,7 @@
 
 struct fake_storage : public uclog::storage
 {
-    virtual void store(const uclog::logger_info& logger, uclog::level_t level, const char* fmt, va_list args)
+    virtual void store(uclog::level_t level, const char* fmt, va_list args)
     {
         char buf[1024];
         int size = vsnprintf(buf, 1024, fmt, args);

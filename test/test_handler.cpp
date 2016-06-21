@@ -21,21 +21,20 @@ TEST(handler, sets_level)
     EXPECT_EQ(level_info, h.level());
 }
 
-static void log(handler& handler, const logger_info& logger, level_t level, const char* fmt, ...)
+static void log(handler& handler, level_t level, const char* fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    handler.log(logger, level, fmt, args);
+    handler.log(level, fmt, args);
     va_end(args);
 }
 
 TEST(handler, logs_when_level_not_set)
 {
     fake_storage storage;
-    logger_info info;
     handler h(storage);
 
-    log(h, info, level_debug, "test %d", 42);
+    log(h, level_debug, "test %d", 42);
 
     EXPECT_EQ("test 42", storage.data);
 }
@@ -43,14 +42,13 @@ TEST(handler, logs_when_level_not_set)
 TEST(handler, logs_when_level_not_lower)
 {
     fake_storage storage;
-    logger_info info;
     handler h(storage, level_warning);
 
-    log(h, info, level_debug, "a");
-    log(h, info, level_info, "b");
-    log(h, info, level_warning, "c");
-    log(h, info, level_error, "d");
-    log(h, info, level_critical, "e");
+    log(h, level_debug, "a");
+    log(h, level_info, "b");
+    log(h, level_warning, "c");
+    log(h, level_error, "d");
+    log(h, level_critical, "e");
 
     EXPECT_EQ("cde", storage.data);
 }

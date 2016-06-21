@@ -7,7 +7,7 @@ enum { N = 1024 * 128 };
 
 struct null_storage : public uclog::storage
 {
-    virtual void store(const uclog::logger_info& logger, uclog::level_t level, const char* fmt, va_list args)
+    virtual void store(uclog::level_t level, const char* fmt, va_list args)
     { }
 };
 
@@ -66,7 +66,7 @@ int main()
     null_storage storage;
     uclog::handler h1(storage, uclog::level_warning);
     uclog::handler h2(storage, uclog::level_warning);
-    uclog::logger logger(uclog::logger_info(), uclog::level_info);
+    uclog::logger logger(uclog::level_info);
     logger.add_handler(h1);
     logger.add_handler(h2);
     lgr = &logger;

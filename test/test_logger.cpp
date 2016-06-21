@@ -5,28 +5,12 @@
 using namespace testing;
 using namespace uclog;
 
-static logger_info test_info("test_info", 42);
-
 TEST(logger, initializes_level)
 {
     logger fake_parent;
 
     EXPECT_EQ(level_debug, logger().level());
-    EXPECT_EQ(level_debug, logger(test_info).level());
-    EXPECT_EQ(level_warning, logger(test_info, level_warning).level());
-}
-
-TEST(logger, initializes_info)
-{
-    logger fake_parent;
-
-    EXPECT_EQ(std::string(""), logger().name());
-    EXPECT_EQ(std::string("test_info"), logger(test_info).name());
-    EXPECT_EQ(std::string("test_info"), logger(test_info, level_warning).name());
-
-    EXPECT_EQ(0, logger().id());
-    EXPECT_EQ(42, logger(test_info).id());
-    EXPECT_EQ(42, logger(test_info, level_warning).id());
+    EXPECT_EQ(level_warning, logger(level_warning).level());
 }
 
 TEST(logger, sets_level)
@@ -40,7 +24,7 @@ TEST(logger, logs_to_single_handler)
 {
     fake_storage storage;
     handler h(storage);
-    logger lgr(test_info, level_warning);
+    logger lgr(level_warning);
     lgr.add_handler(h);
 
     lgr.log(level_warning, "test %d", 42);
@@ -53,7 +37,7 @@ TEST(logger, logs_to_multiple_handlers)
     fake_storage storage;
     handler h1(storage);
     handler h2(storage);
-    logger lgr(test_info, level_warning);
+    logger lgr(level_warning);
     lgr.add_handler(h1);
     lgr.add_handler(h2);
 
@@ -66,7 +50,7 @@ TEST(logger, filters_when_level_lower)
 {
     fake_storage storage;
     handler h(storage);
-    logger lgr(test_info, level_warning);
+    logger lgr(level_warning);
     lgr.add_handler(h);
 
     lgr.log(level_debug, "test %d ", 42);
