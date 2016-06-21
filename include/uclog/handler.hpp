@@ -11,10 +11,10 @@ namespace uclog
 class handler
 {
 public:
-    handler(): storage_(), level_(level_not_set)
+    handler(): storage_(), level_(level_debug)
     { }
 
-    explicit handler(storage& storage): storage_(&storage), level_(level_not_set)
+    explicit handler(storage& storage): storage_(&storage), level_(level_debug)
     { }
 
     handler(storage& storage, level_t level): storage_(&storage), level_(level)

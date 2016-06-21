@@ -9,8 +9,8 @@ TEST(handler, initializes_level)
 {
     storage* fake_stor = 0;
 
-    EXPECT_EQ(level_not_set, handler().level());
-    EXPECT_EQ(level_not_set, handler(*fake_stor).level());
+    EXPECT_EQ(level_debug, handler().level());
+    EXPECT_EQ(level_debug, handler(*fake_stor).level());
     EXPECT_EQ(level_critical, handler(*fake_stor, level_critical).level());
 }
 

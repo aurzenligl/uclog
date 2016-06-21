@@ -66,11 +66,10 @@ int main()
     null_storage storage;
     uclog::handler h1(storage, uclog::level_warning);
     uclog::handler h2(storage, uclog::level_warning);
-    uclog::logger lgr1(uclog::logger_info(), uclog::level_info);
-    uclog::logger lgr2(uclog::logger_info(), lgr1);
-    lgr1.add_handler(h1);
-    lgr1.add_handler(h2);
-    lgr = &lgr2;
+    uclog::logger logger(uclog::logger_info(), uclog::level_info);
+    logger.add_handler(h1);
+    logger.add_handler(h2);
+    lgr = &logger;
 
     test_result results[] = {
         test<test_filter_on_logger>()("test_filter_on_logger"),

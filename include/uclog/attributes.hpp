@@ -6,7 +6,6 @@ namespace uclog
 
 enum level_t
 {
-    level_not_set = 0,
     level_debug = 10,
     level_info = 20,
     level_warning = 30,
