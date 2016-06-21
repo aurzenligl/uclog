@@ -10,20 +10,34 @@ namespace uclog
 
 class logger;
 
-struct site
+struct site_info
 {
     int id;
     const char* fmt;
     array_view<arg_spec> args;
 };
 
-template <int N>
-struct site_data
-{
-    site_data(logger& lgr, const char* fmt, ...);
+void init_site(array_view<arg_spec> args,
+               intr_list_node<site_info>& info,
+               logger& lgr,
+               const char* fmt,
+               va_list vaargs);
 
+template <int N>
+class site
+{
+public:
+    site(logger& lgr, const char* fmt, ...)
+    {
+        va_list vaargs;
+        va_start(vaargs, fmt);
+        init_site(args, node, lgr, fmt, vaargs);
+        va_end(vaargs);
+    }
+
+private:
     arg_spec args[N];
-    intr_list_node<site> node;
+    intr_list_node<site_info> node;
 };
 
 } // namespace uclog

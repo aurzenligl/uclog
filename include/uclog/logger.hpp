@@ -34,10 +34,21 @@ public:
         handlers_.push_back(&handler);
     }
 
+    void add_site(intr_list_node<site_info>& site)
+    {
+        sites_.push_front(site);
+    }
+
+    const intr_list<site_info>& sites() const
+    {
+        return sites_;
+    }
+
     void log(level_t level, const char* fmt, ...);
 
 private:
     std::vector<handler*> handlers_;
+    intr_list<site_info> sites_;
     level_t level_;
 };
 

@@ -8,31 +8,29 @@ template <typename T>
 struct intr_list_node
 {
     T data;
-    T* next;
+    intr_list_node<T>* next;
 };
 
 template <typename T>
 class intr_list
 {
 public:
+    intr_list(): first_(0)
+    { }
+
     void push_front(intr_list_node<T>& node)
     {
-        node.next = first;
-        first = &node;
+        node.next = first_;
+        first_ = &node;
     }
 
-    intr_list_node<T>* begin()
-    {
-        return first;
-    }
-
-    intr_list_node<T>* end()
-    {
-        return 0;
-    }
+    intr_list_node<T>* begin() { return first_; }
+    const intr_list_node<T>* begin() const { return first_; }
+    intr_list_node<T>* end() { return 0; }
+    const intr_list_node<T>* end() const { return 0; }
 
 private:
-    intr_list_node<T>* first;
+    intr_list_node<T>* first_;
 };
 
 } // namespace uclog
