@@ -6,26 +6,7 @@
 namespace uclog
 {
 
-enum arg_type
-{
-    arg_type_none,
-    arg_type_char,
-    arg_type_short,
-    arg_type_int,
-    arg_type_long,
-    arg_type_long_long,
-    arg_type_pointer,
-    arg_type_string,
-    arg_type_float,
-    arg_type_double
-};
-
-struct arg_spec
-{
-    arg_type type;
-};
-
-static size_t arg_decode(const char* fmt, arg_spec* spec)
+size_t arg_decode(const char* fmt, arg_spec* spec)
 {
     const char* start = fmt;
 
