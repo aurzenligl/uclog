@@ -34,12 +34,12 @@ public:
         handlers_.push_back(&handler);
     }
 
-    void add_site(intr_list_node<site_info>& site)
+    void add_site(site& site)
     {
         sites_.push_front(site);
     }
 
-    const intr_list<site_info>& sites() const
+    const intr_list<site>& sites() const
     {
         return sites_;
     }
@@ -48,7 +48,7 @@ public:
 
 private:
     std::vector<handler*> handlers_;
-    intr_list<site_info> sites_;
+    intr_list<site> sites_;
     level_t level_;
 };
 

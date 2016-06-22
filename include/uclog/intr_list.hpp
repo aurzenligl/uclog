@@ -1,16 +1,14 @@
 #ifndef UCLOG_INTR_LIST_HPP_
 #define UCLOG_INTR_LIST_HPP_
 
+#include <cstddef>
+
 namespace uclog
 {
 
-template <typename T>
-struct intr_list_node
-{
-    T data;
-    intr_list_node<T>* next;
-};
-
+/*
+ * List elements must have id and next members.
+ */
 template <typename T>
 class intr_list
 {
@@ -18,19 +16,20 @@ public:
     intr_list(): first_(0)
     { }
 
-    void push_front(intr_list_node<T>& node)
+    void push_front(T& node)
     {
+        node.id = first_ ? (first_->id + 1) : 0;
         node.next = first_;
         first_ = &node;
     }
 
-    intr_list_node<T>* begin() { return first_; }
-    const intr_list_node<T>* begin() const { return first_; }
-    intr_list_node<T>* end() { return 0; }
-    const intr_list_node<T>* end() const { return 0; }
+    T* begin() { return first_; }
+    const T* begin() const { return first_; }
+    T* end() { return 0; }
+    const T* end() const { return 0; }
 
 private:
-    intr_list_node<T>* first_;
+    T* first_;
 };
 
 } // namespace uclog
