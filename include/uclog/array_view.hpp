@@ -10,6 +10,9 @@ template <typename T>
 class array_view
 {
 public:
+    array_view(): begin_(0), end_(0)
+    { }
+
     array_view(T* data, size_t size): begin_(data), end_(data + size)
     { }
 
@@ -21,6 +24,11 @@ public:
     const T* begin() const { return begin_; }
     T* end() { return end_; }
     const T* end() const { return end_; }
+
+    size_t size() const
+    {
+        return end_ - begin_;
+    }
 
 private:
     T* begin_;

@@ -3,13 +3,15 @@
 
 #include <cstdarg>
 #include <uclog/level.hpp>
+#include <uclog/site.hpp>
 
 namespace uclog
 {
 
 struct storage
 {
-    virtual void store(level_t level, const char* fmt, va_list args) = 0;
+    virtual void add_site(const site_t& site) = 0;
+    virtual void log(const site_t& site, va_list args) = 0;
 };
 
 } // namespace uclog

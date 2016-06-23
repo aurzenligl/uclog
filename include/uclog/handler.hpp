@@ -30,11 +30,16 @@ public:
         level_ = level;
     }
 
-    void log(level_t level, const char* fmt, va_list args)
+    void add_site(const site_t& site)
     {
-        if (level >= level_)
+        storage_->add_site(site);
+    }
+
+    void log(const site_t& site, va_list args)
+    {
+        if (site.level >= level_)
         {
-            storage_->store(level, fmt, args);
+            storage_->log(site, args);
         }
     }
 

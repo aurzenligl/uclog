@@ -2,34 +2,33 @@
 #define UCLOG_SITE_HPP_
 
 #include <uclog/array_view.hpp>
-#include <uclog/intr_list.hpp>
 #include <uclog/bprintf.hpp>
+#include <uclog/level.hpp>
 
 namespace uclog
 {
 
 class logger;
 
-struct site
+struct site_t
 {
-    site(logger& lgr, const char* in_fmt, array_view<arg_spec> in_args);
+    site_t(){}
+    site_t(logger& lgr, level_t lvl, const char* in_fmt, const array_view<arg_type>& in_args);
 
-    const char* fmt;
-    array_view<arg_spec> args;
     int id;
-    site* next;
+    level_t level;
+    const char* fmt;
+    array_view<arg_type> args;
 };
 
 template <int N>
-class site_data
+struct site_data
 {
-public:
-    site_data(logger& lgr, const char* fmt): node(lgr, fmt, args)
+    site_data(logger& lgr, level_t lvl, const char* fmt): site(lgr, lvl, fmt, array_view<arg_type>(args, N))
     { }
 
-private:
-    arg_spec args[N];
-    site node;
+    arg_type args[N];
+    site_t site;
 };
 
 } // namespace uclog

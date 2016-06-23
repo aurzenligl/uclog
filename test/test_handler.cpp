@@ -23,9 +23,13 @@ TEST(handler, sets_level)
 
 static void log(handler& handler, level_t level, const char* fmt, ...)
 {
+    site_t site;
+    site.level = level;
+    site.fmt = fmt;
+
     va_list args;
     va_start(args, fmt);
-    handler.log(level, fmt, args);
+    handler.log(site, args);
     va_end(args);
 }
 

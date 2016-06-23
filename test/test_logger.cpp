@@ -1,9 +1,18 @@
 #include <gtest/gtest.h>
 #include <uclog/logger.hpp>
+#include <uclog/handler.hpp>
 #include "fake_storage.hpp"
 
 using namespace testing;
 using namespace uclog;
+
+static site_t make_site(level_t level, const char* fmt)
+{
+    site_t site;
+    site.level = level;
+    site.fmt = fmt;
+    return site;
+}
 
 TEST(logger, initializes_level)
 {
@@ -27,7 +36,7 @@ TEST(logger, logs_to_single_handler)
     logger lgr(level_warning);
     lgr.add_handler(h);
 
-    lgr.log(level_warning, "test %d", 42);
+    lgr.log(make_site(level_warning, "test %d"), 42);
 
     EXPECT_EQ("test 42", storage.data);
 }
@@ -41,7 +50,7 @@ TEST(logger, logs_to_multiple_handlers)
     lgr.add_handler(h1);
     lgr.add_handler(h2);
 
-    lgr.log(level_warning, "test %d ", 42);
+    lgr.log(make_site(level_warning, "test %d "), 42);
 
     EXPECT_EQ("test 42 test 42 ", storage.data);
 }
@@ -53,14 +62,14 @@ TEST(logger, filters_when_level_lower)
     logger lgr(level_warning);
     lgr.add_handler(h);
 
-    lgr.log(level_debug, "test %d ", 42);
+    lgr.log(make_site(level_debug, "test %d "), 42);
     EXPECT_EQ("", storage.read_and_clear());
-    lgr.log(level_info, "test %d ", 42);
+    lgr.log(make_site(level_info, "test %d "), 42);
     EXPECT_EQ("", storage.read_and_clear());
-    lgr.log(level_warning, "test %d ", 42);
+    lgr.log(make_site(level_warning, "test %d "), 42);
     EXPECT_EQ("test 42 ", storage.read_and_clear());
-    lgr.log(level_error, "test %d ", 42);
+    lgr.log(make_site(level_error, "test %d "), 42);
     EXPECT_EQ("test 42 ", storage.read_and_clear());
-    lgr.log(level_critical, "test %d ", 42);
+    lgr.log(make_site(level_critical, "test %d "), 42);
     EXPECT_EQ("test 42 ", storage.read_and_clear());
 }

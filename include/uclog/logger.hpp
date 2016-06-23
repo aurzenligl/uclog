@@ -3,20 +3,21 @@
 
 #include <cstdarg>
 #include <vector>
-#include <uclog/handler.hpp>
 #include <uclog/site.hpp>
 #include <uclog/level.hpp>
 
 namespace uclog
 {
 
+class handler;
+
 class logger
 {
 public:
-    logger(): level_(level_debug)
+    logger(): level_(level_debug), next_site_(0)
     { }
 
-    explicit logger(level_t level): level_(level)
+    explicit logger(level_t level): level_(level), next_site_(0)
     { }
 
     level_t level() const
@@ -29,27 +30,20 @@ public:
         level_ = level;
     }
 
-    void add_handler(handler& handler)
-    {
-        handlers_.push_back(&handler);
-    }
+    void add_handler(handler& handler);
 
-    void add_site(site& site)
-    {
-        sites_.push_front(site);
-    }
+    void add_site(const site_t& site);
 
-    const intr_list<site>& sites() const
-    {
-        return sites_;
-    }
+    int enumerate_site();
 
-    void log(level_t level, const char* fmt, ...);
+    void log(const site_t& site, ...);
 
 private:
-    std::vector<handler*> handlers_;
-    intr_list<site> sites_;
+    typedef std::vector<handler*> handlers_t;
+
+    handlers_t handlers_;
     level_t level_;
+    int next_site_;
 };
 
 } // namespace uclog
