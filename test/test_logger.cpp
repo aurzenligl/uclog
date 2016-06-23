@@ -82,9 +82,7 @@ TEST(logger, adds_sites_to_storages)
     logger lgr(level_warning);
     lgr.add_handler(h);
 
-    site_t site1 = make_site(level_debug, "test %d ");
-    site_t site2 = make_site(level_critical, "test %d ");
-    lgr.add_site(site1);
-    lgr.add_site(site2);
-    EXPECT_EQ((std::vector<const site_t*>{&site1, &site2}), storage.sites);
+    site_data<1> site1(lgr, level_debug, "test %d ");
+    site_data<1> site2(lgr, level_critical, "test %d ");
+    EXPECT_EQ((std::vector<const site_t*>{&site1.site, &site2.site}), storage.sites);
 }
