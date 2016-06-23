@@ -9,6 +9,7 @@ using namespace uclog;
 static site_t make_site(level_t level, const char* fmt)
 {
     site_t site;
+    site.id = 0;
     site.level = level;
     site.fmt = fmt;
     return site;
@@ -72,4 +73,18 @@ TEST(logger, filters_when_level_lower)
     EXPECT_EQ("test 42 ", storage.read_and_clear());
     lgr.log(make_site(level_critical, "test %d "), 42);
     EXPECT_EQ("test 42 ", storage.read_and_clear());
+}
+
+TEST(logger, adds_sites_to_storages)
+{
+    fake_storage storage;
+    handler h(storage);
+    logger lgr(level_warning);
+    lgr.add_handler(h);
+
+    site_t site1 = make_site(level_debug, "test %d ");
+    site_t site2 = make_site(level_critical, "test %d ");
+    lgr.add_site(site1);
+    lgr.add_site(site2);
+    EXPECT_EQ((std::vector<const site_t*>{&site1, &site2}), storage.sites);
 }

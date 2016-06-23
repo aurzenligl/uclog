@@ -1,6 +1,7 @@
 #ifndef TEST_FAKE_STORAGE_HPP_
 #define TEST_FAKE_STORAGE_HPP_
 
+#include <vector>
 #include <string>
 #include <uclog/storage.hpp>
 
@@ -8,7 +9,7 @@ struct fake_storage : public uclog::storage
 {
     void add_site(const uclog::site_t& site)
     {
-        // ...
+        sites.push_back(&site);
     }
 
     void log(const uclog::site_t& site, va_list args)
@@ -26,6 +27,7 @@ struct fake_storage : public uclog::storage
     }
 
     std::string data;
+    std::vector<const uclog::site_t*> sites;
 };
 
 #endif /* TEST_FAKE_STORAGE_HPP_ */
