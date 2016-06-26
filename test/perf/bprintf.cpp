@@ -15,7 +15,6 @@ struct test_result
     double v1;
     double v2;
     double v3;
-    double v4;
 };
 
 struct printf_adapter
@@ -47,7 +46,7 @@ struct site_adapter
 
     void operator()(void* buf, size_t size, size_t narg, const char* fmt, ...)
     {
-        site_t(lgr, level_critical, fmt, array_view<arg_type>(args, 5));
+        site_t(lgr, level_critical, fmt, array_view<arg_type>(args, narg));
     }
 };
 
