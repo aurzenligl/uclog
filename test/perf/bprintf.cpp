@@ -1,7 +1,11 @@
 #include <cstdio>
 #include <ctime>
 #include <uclog/bprintf.hpp>
+#include <uclog/site.hpp>
+#include <uclog/logger.hpp>
 #include "measure_time.hpp"
+
+using namespace uclog;
 
 enum { N = 1024 * 128 };
 
@@ -10,11 +14,13 @@ struct test_result
     const char* name;
     double v1;
     double v2;
+    double v3;
+    double v4;
 };
 
 struct printf_adapter
 {
-    void operator()(void* buf, size_t size, const char* fmt, ...)
+    void operator()(void* buf, size_t size, size_t narg, const char* fmt, ...)
     {
         va_list args;
         va_start(args, fmt);
@@ -25,14 +31,28 @@ struct printf_adapter
 
 struct bprintf_adapter
 {
-    void operator()(void* buf, size_t size, const char* fmt, ...)
+    void operator()(void* buf, size_t size, size_t narg, const char* fmt, ...)
     {
         va_list args;
         va_start(args, fmt);
-        uclog::vsnbprintf(buf, size, fmt, args);
+        vsnbprintf(buf, size, fmt, args);
         va_end(args);
     }
 };
+
+struct site_adapter
+{
+    static arg_type args[32];
+    static logger lgr;
+
+    void operator()(void* buf, size_t size, size_t narg, const char* fmt, ...)
+    {
+        site_t(lgr, level_critical, fmt, array_view<arg_type>(args, 5));
+    }
+};
+
+arg_type site_adapter::args[32];
+logger site_adapter::lgr;
 
 template <template <typename> class TestCase>
 test_result test(const char* name)
@@ -53,6 +73,13 @@ test_result test(const char* name)
             TestCase<bprintf_adapter>()();
         }
     }
+    {
+        measure_time _(&res.v3);
+        for (int i = 0; i < N; i++)
+        {
+            TestCase<site_adapter>()();
+        }
+    }
     return res;
 }
 
@@ -62,7 +89,7 @@ struct test_fmt
     void operator()()
     {
         char buf[1024];
-        FuncType()(buf, 1024,
+        FuncType()(buf, 1024, 1,
             "hisuhdspoaiuhdaouhfaodshapsdgoihsdgouashpfdhfp[wenpimc[ejmiejrcqwejrwepijraoakpsoka"
         );
     }
@@ -74,7 +101,7 @@ struct test_strings
     void operator()()
     {
         char buf[1024];
-        FuncType()(buf, 1024, "%s %s %s", "ala", "ma", "kota");
+        FuncType()(buf, 1024, 3, "%s %s %s", "ala", "ma", "kota");
     }
 };
 
@@ -84,7 +111,7 @@ struct test_int
     void operator()()
     {
         char buf[1024];
-        FuncType()(buf, 1024, "%d %d %d %d", 42, 42, 42, 42);
+        FuncType()(buf, 1024, 4, "%d %d %d %d", 42, 42, 42, 42);
     }
 };
 
@@ -94,7 +121,7 @@ struct test_float
     void operator()()
     {
         char buf[1024];
-        FuncType()(buf, 1024, "%f %le %G %lA", 42., 42., 42., 42.);
+        FuncType()(buf, 1024, 4, "%f %le %G %lA", 42., 42., 42., 42.);
     }
 };
 
@@ -104,7 +131,7 @@ struct test_many_ints
     void operator()()
     {
         char buf[1024];
-        FuncType()(buf, 1024,
+        FuncType()(buf, 1024, 20,
             "%hhd %hhd %hhd %hhd "
             "%hd %hd %hd %hd "
             "%d %d %d %d "
@@ -129,10 +156,10 @@ int main()
         test<test_many_ints>("test_many_ints")
     };
 
-    printf("%20s %20s %20s\n", "", "snprintf", "uclog::snbprintf");
+    printf("%20s %20s %20s %20s\n", "", "snprintf", "snbprintf", "site");
     for (auto& res : results)
     {
-        printf("%-20s %20lf %20lf\n", res.name, res.v1, res.v2);
+        printf("%-20s %20lf %20lf %20lf\n", res.name, res.v1, res.v2, res.v3);
     }
 
     return 0;
