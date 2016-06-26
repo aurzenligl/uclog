@@ -23,9 +23,9 @@ int logger::enumerate_site()
     return next_site_++;
 }
 
-void logger::log(const site_t& site, ...)
+void logger::log(const site_t* site, ...)
 {
-    if (site.level < level_)
+    if (site->level < level_)
     {
         return;
     }
@@ -36,7 +36,7 @@ void logger::log(const site_t& site, ...)
     {
         va_list args;
         va_copy(args, src_args);
-        (*h)->log(site, args);
+        (*h)->log(*site, args);
         va_end(args);
     }
     va_end(src_args);

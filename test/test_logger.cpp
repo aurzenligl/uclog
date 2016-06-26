@@ -6,13 +6,23 @@
 using namespace testing;
 using namespace uclog;
 
-static site_t make_site(level_t level, const char* fmt)
+struct site_wrap
 {
+    site_t* get()
+    {
+        return &site;
+    }
+
     site_t site;
-    site.id = 0;
-    site.level = level;
-    site.fmt = fmt;
-    return site;
+};
+
+static site_wrap make_site(level_t level, const char* fmt)
+{
+    site_wrap wrap;
+    wrap.site.id = 0;
+    wrap.site.level = level;
+    wrap.site.fmt = fmt;
+    return wrap;
 }
 
 TEST(logger, initializes_level)
@@ -37,7 +47,7 @@ TEST(logger, logs_to_single_handler)
     logger lgr(level_warning);
     lgr.add_handler(h);
 
-    lgr.log(make_site(level_warning, "test %d"), 42);
+    lgr.log(make_site(level_warning, "test %d").get(), 42);
 
     EXPECT_EQ("test 42\n", storage.data);
 }
@@ -51,7 +61,7 @@ TEST(logger, logs_to_multiple_handlers)
     lgr.add_handler(h1);
     lgr.add_handler(h2);
 
-    lgr.log(make_site(level_warning, "test %d"), 42);
+    lgr.log(make_site(level_warning, "test %d").get(), 42);
 
     EXPECT_EQ("test 42\ntest 42\n", storage.data);
 }
@@ -63,15 +73,15 @@ TEST(logger, filters_when_level_lower)
     logger lgr(level_warning);
     lgr.add_handler(h);
 
-    lgr.log(make_site(level_debug, "test %d"), 42);
+    lgr.log(make_site(level_debug, "test %d").get(), 42);
     EXPECT_EQ("", storage.read_and_clear());
-    lgr.log(make_site(level_info, "test %d"), 42);
+    lgr.log(make_site(level_info, "test %d").get(), 42);
     EXPECT_EQ("", storage.read_and_clear());
-    lgr.log(make_site(level_warning, "test %d"), 42);
+    lgr.log(make_site(level_warning, "test %d").get(), 42);
     EXPECT_EQ("test 42\n", storage.read_and_clear());
-    lgr.log(make_site(level_error, "test %d"), 42);
+    lgr.log(make_site(level_error, "test %d").get(), 42);
     EXPECT_EQ("test 42\n", storage.read_and_clear());
-    lgr.log(make_site(level_critical, "test %d"), 42);
+    lgr.log(make_site(level_critical, "test %d").get(), 42);
     EXPECT_EQ("test 42\n", storage.read_and_clear());
 }
 

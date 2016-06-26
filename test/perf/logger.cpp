@@ -35,7 +35,7 @@ struct test_filter_on_logger
 {
     void operator()(uclog::logger& lgr, const uclog::site_t& site)
     {
-        lgr.log(site, 13, 42);
+        lgr.log(&site, 13, 42);
     }
 };
 
@@ -43,7 +43,7 @@ struct test_filter_on_handlers
 {
     void operator()(uclog::logger& lgr, const uclog::site_t& site)
     {
-        lgr.log(site, 13, 42);
+        lgr.log(&site, 13, 42);
     }
 };
 
@@ -51,7 +51,7 @@ struct test_pass_to_handlers
 {
     void operator()(uclog::logger& lgr, const uclog::site_t& site)
     {
-        lgr.log(site, 13, 42);
+        lgr.log(&site, 13, 42);
     }
 };
 

@@ -10,7 +10,7 @@
     {                                                                          \
         static const uclog::site_data<UCLOG_NARG(__VA_ARGS__)>                 \
             UCLOG_LINE(site)(*UCLOG_LINE(lgr), uclog::level_##LEVEL, FMT);     \
-        UCLOG_LINE(lgr)->log(UCLOG_LINE(site).site                             \
+        UCLOG_LINE(lgr)->log(&UCLOG_LINE(site).site                            \
             UCLOG_WHEN(UCLOG_NARG(__VA_ARGS__))(,) __VA_ARGS__);               \
     }
 

@@ -36,7 +36,7 @@ public:
 
     int enumerate_site();
 
-    void log(const site_t& site, ...);
+    void log(const site_t* site, ...);
 
 private:
     typedef std::vector<handler*> handlers_t;
