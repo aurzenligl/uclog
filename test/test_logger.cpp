@@ -39,7 +39,7 @@ TEST(logger, logs_to_single_handler)
 
     lgr.log(make_site(level_warning, "test %d"), 42);
 
-    EXPECT_EQ("test 42", storage.data);
+    EXPECT_EQ("test 42\n", storage.data);
 }
 
 TEST(logger, logs_to_multiple_handlers)
@@ -51,9 +51,9 @@ TEST(logger, logs_to_multiple_handlers)
     lgr.add_handler(h1);
     lgr.add_handler(h2);
 
-    lgr.log(make_site(level_warning, "test %d "), 42);
+    lgr.log(make_site(level_warning, "test %d"), 42);
 
-    EXPECT_EQ("test 42 test 42 ", storage.data);
+    EXPECT_EQ("test 42\ntest 42\n", storage.data);
 }
 
 TEST(logger, filters_when_level_lower)
@@ -63,16 +63,16 @@ TEST(logger, filters_when_level_lower)
     logger lgr(level_warning);
     lgr.add_handler(h);
 
-    lgr.log(make_site(level_debug, "test %d "), 42);
+    lgr.log(make_site(level_debug, "test %d"), 42);
     EXPECT_EQ("", storage.read_and_clear());
-    lgr.log(make_site(level_info, "test %d "), 42);
+    lgr.log(make_site(level_info, "test %d"), 42);
     EXPECT_EQ("", storage.read_and_clear());
-    lgr.log(make_site(level_warning, "test %d "), 42);
-    EXPECT_EQ("test 42 ", storage.read_and_clear());
-    lgr.log(make_site(level_error, "test %d "), 42);
-    EXPECT_EQ("test 42 ", storage.read_and_clear());
-    lgr.log(make_site(level_critical, "test %d "), 42);
-    EXPECT_EQ("test 42 ", storage.read_and_clear());
+    lgr.log(make_site(level_warning, "test %d"), 42);
+    EXPECT_EQ("test 42\n", storage.read_and_clear());
+    lgr.log(make_site(level_error, "test %d"), 42);
+    EXPECT_EQ("test 42\n", storage.read_and_clear());
+    lgr.log(make_site(level_critical, "test %d"), 42);
+    EXPECT_EQ("test 42\n", storage.read_and_clear());
 }
 
 TEST(logger, adds_sites_to_storages)

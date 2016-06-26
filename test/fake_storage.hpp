@@ -14,9 +14,11 @@ struct fake_storage : public uclog::storage
 
     void log(const uclog::site_t& site, va_list args)
     {
-        char buf[1024];
-        int size = vsnprintf(buf, 1024, site.fmt, args);
-        data.insert(data.end(), buf, buf + size);
+        enum { N = 1024 };
+        char buf[N];
+        int size = vsnprintf(buf, N - 1, site.fmt, args);
+        buf[size] = '\n';
+        data.insert(data.end(), buf, buf + size + 1);
     }
 
     std::string read_and_clear()

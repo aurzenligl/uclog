@@ -40,7 +40,7 @@ TEST(handler, logs_when_level_not_set)
 
     log(h, level_debug, "test %d", 42);
 
-    EXPECT_EQ("test 42", storage.data);
+    EXPECT_EQ("test 42\n", storage.data);
 }
 
 TEST(handler, logs_when_level_not_lower)
@@ -54,5 +54,5 @@ TEST(handler, logs_when_level_not_lower)
     log(h, level_error, "d");
     log(h, level_critical, "e");
 
-    EXPECT_EQ("cde", storage.data);
+    EXPECT_EQ("c\nd\ne\n", storage.data);
 }
