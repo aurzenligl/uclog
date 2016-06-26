@@ -13,29 +13,36 @@ def configure(ctx):
 
 def build(ctx):
     ctx(features = 'cxx',
-        target = 'uclog',
+        target = 'uclog_dbg',
         includes = 'include',
         export_includes = 'include',
         source = ctx.path.ant_glob('src/*.cpp'),
-        cxxflags = '-g -Wall -O3')
+        cxxflags = '-g -Wall')
 
     ctx(features = 'cxx cxxprogram test',
         target = 'test_uclog',
         source = ctx.path.ant_glob('test/*.cpp'),
         cxxflags = '-g -Wall -std=c++11',
         lib = 'gtest pthread',
-        use = 'uclog')
+        use = 'uclog_dbg')
+
+    ctx(features = 'cxx',
+        target = 'uclog',
+        includes = 'include',
+        export_includes = 'include',
+        source = ctx.path.ant_glob('src/*.cpp'),
+        cxxflags = '-g -Wall -DNDEBUG -O3')
 
     ctx(features = 'cxx cxxprogram',
         target = 'testperfbprintf',
         source = ctx.path.ant_glob('test/perf/bprintf.cpp'),
-        cxxflags = '-g -Wall -O3 -std=c++11',
+        cxxflags = '-g -Wall -DNDEBUG -O3 -std=c++11',
         use = 'uclog')
 
     ctx(features = 'cxx cxxprogram',
         target = 'testperflogger',
         source = ctx.path.ant_glob('test/perf/logger.cpp'),
-        cxxflags = '-g -Wall -O3 -std=c++11',
+        cxxflags = '-g -Wall -DNDEBUG -O3 -std=c++11',
         use = 'uclog')
 
     ctx.add_post_fun(Tools.waf_unit_test.summary)

@@ -10,17 +10,19 @@ using namespace uclog;
 // 1. these tests will work only on little endian machines
 // 2. SCN scanf macros used since they differentiate between i8, i16, i32
 
+typedef std::vector<uint8_t> bytes_t;
+
 template <typename... Ts>
-std::vector<uint8_t> snbprintf_to_limited_vector(size_t limit, const char* fmt, Ts... vs)
+static bytes_t snbprintf_to_limited_vector(size_t limit, const char* fmt, Ts... vs)
 {
-    std::vector<uint8_t> out(limit);
+    bytes_t out(limit);
     size_t written = snbprintf(out.data(), out.size(), fmt, vs...);
     out.resize(written);
     return out;
 }
 
 template <typename... Ts>
-std::vector<uint8_t> snbprintf_to_vector(const char* fmt, Ts... vs)
+static bytes_t snbprintf_to_vector(const char* fmt, Ts... vs)
 {
     return snbprintf_to_limited_vector(1024, fmt, vs...);
 }
@@ -208,4 +210,62 @@ TEST(bprintf, prints_heterogenous_arguments)
             int32_t(-42), int32_t(-42), int32_t(-42), "abcd", -42., -42.
         )
     );
+}
+
+template <typename... Ts>
+static bytes_t args_encode_to_limit_vec(size_t limit, const std::vector<arg_type>& types, Ts... vs)
+{
+    bytes_t out(limit);
+    size_t written = args_encode(out.data(), out.size(), types.data(), types.size(), vs...);
+    out.resize(written);
+    return out;
+}
+
+template <typename... Ts>
+static bytes_t args_encode_to_vec(const std::vector<arg_type>& types, Ts... vs)
+{
+    return args_encode_to_limit_vec(1024, types, vs...);
+}
+
+template <typename T>
+static bytes_t to_bytes(T t)
+{
+    bytes_t buf(sizeof(T));
+    memcpy(buf.data(), &t, sizeof(T));
+    return buf;
+}
+
+static bytes_t str_to_bytes(std::string t)
+{
+    bytes_t buf(t.size() + 1);
+    memcpy(buf.data(), t.c_str(), t.size() + 1);
+    return buf;
+}
+
+static bytes_t operator+(const bytes_t& x, const bytes_t& y)
+{
+    bytes_t z(x);
+    z.insert(z.end(), y.begin(), y.end());
+    return z;
+}
+
+TEST(bprintf, encodes_single_arg)
+{
+    EXPECT_EQ(to_bytes<char>(1), args_encode_to_vec({arg_type_char}, 1));
+    EXPECT_EQ(to_bytes<short>(2), args_encode_to_vec({arg_type_short}, 2));
+    EXPECT_EQ(to_bytes<int>(3), args_encode_to_vec({arg_type_int}, 3));
+    EXPECT_EQ(to_bytes<long>(4), args_encode_to_vec({arg_type_long}, 4));
+    EXPECT_EQ(to_bytes<long long>(5), args_encode_to_vec({arg_type_long_long}, 5));
+    EXPECT_EQ(to_bytes<float>(6.), args_encode_to_vec({arg_type_float}, 6.));
+    EXPECT_EQ(to_bytes<double>(6.), args_encode_to_vec({arg_type_double}, 6.));
+    EXPECT_EQ(to_bytes<void*>(nullptr), args_encode_to_vec({arg_type_pointer}, nullptr));
+    EXPECT_EQ(str_to_bytes("abc"), args_encode_to_vec({arg_type_string}, "abc"));
+    EXPECT_EQ(bytes(""), args_encode_to_vec({arg_type_none}));
+}
+
+TEST(bprintf, encodes_multiple_args)
+{
+    EXPECT_EQ(
+        to_bytes<char>(1) + to_bytes<long long>(5) + str_to_bytes("abc") + to_bytes<float>(6.),
+        args_encode_to_vec({arg_type_char, arg_type_long_long, arg_type_string, arg_type_float}, 1, 5, "abc", 6.));
 }
