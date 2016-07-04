@@ -44,9 +44,6 @@ TEST(basic_log, logs)
         to_vec<int>(2, 1, 0),
         ex_vec<int>(stor.sites, [](const uclog::site_t* s){ return s->args.size(); }));
     EXPECT_EQ(
-        to_vec<int>(0, 1, 2),
-        ex_vec<int>(stor.sites, [](const uclog::site_t* s){ return s->id; }));
-    EXPECT_EQ(
         to_vec<level_t>(level_info, level_warning, level_error),
         ex_vec<level_t>(stor.sites, [](const uclog::site_t* s){ return s->level; }));
 }

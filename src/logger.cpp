@@ -17,12 +17,6 @@ void logger::add_site(const site_t& site)
     }
 }
 
-int logger::enumerate_site()
-{
-    // TODO: concurrency: this needs to be guarded
-    return next_site_++;
-}
-
 void logger::log(const site_t* site, ...)
 {
     if (site->level < level_)

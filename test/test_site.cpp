@@ -61,26 +61,11 @@ TEST(site, saves_arg_specs_too_many)
     EXPECT_EQ(to_args(arg_type_int), to_args(site.site.args));
 }
 
-TEST(site, saves_id)
+TEST(site, saves_hash)
 {
     logger lgr;
-    site_data<0> site1(lgr, level_info, "");
-    site_data<0> site2(lgr, level_info, "");
-    site_data<0> site3(lgr, level_info, "");
 
-    EXPECT_EQ(0, site1.site.id);
-    EXPECT_EQ(1, site2.site.id);
-    EXPECT_EQ(2, site3.site.id);
-}
-
-TEST(site, makes_linked_list)
-{
-    logger lgr;
-    site_data<0> site1(lgr, level_info, "");
-    site_data<0> site2(lgr, level_info, "");
-    site_data<0> site3(lgr, level_info, "");
-
-    EXPECT_EQ(0, site1.site.id);
-    EXPECT_EQ(1, site2.site.id);
-    EXPECT_EQ(2, site3.site.id);
+    EXPECT_EQ(0x811c9dc5, site_data<0>(lgr, level_info, "").site.hash);
+    EXPECT_EQ(0x340ca71c, site_data<0>(lgr, level_info, "1").site.hash);
+    EXPECT_EQ(0x1deb2d6a, site_data<0>(lgr, level_info, "12").site.hash);
 }

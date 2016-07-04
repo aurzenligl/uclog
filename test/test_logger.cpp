@@ -19,7 +19,7 @@ struct site_wrap
 static site_wrap make_site(level_t level, const char* fmt)
 {
     site_wrap wrap;
-    wrap.site.id = 0;
+    wrap.site.hash = 0;
     wrap.site.level = level;
     wrap.site.fmt = fmt;
     return wrap;

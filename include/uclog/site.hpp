@@ -3,6 +3,7 @@
 
 #include <uclog/array_view.hpp>
 #include <uclog/bprintf.hpp>
+#include <uclog/fnv_hash.hpp>
 #include <uclog/level.hpp>
 
 namespace uclog
@@ -15,7 +16,7 @@ struct site_t
     site_t(){}
     site_t(logger& lgr, level_t lvl, const char* in_fmt, const array_view<arg_type>& in_args);
 
-    int id;
+    uint32_t hash;
     level_t level;
     const char* fmt;
     array_view<arg_type> args;

@@ -27,7 +27,7 @@ static const uclog::site_t& make_site()
     static uclog::site_t site;
     site.level = Level;
     site.fmt = "test logger %d %d";
-    site.id = 13;
+    site.hash = 0x12345678;
     return site;
 }
 

@@ -26,7 +26,7 @@ struct gen_args
 } // unnamed namespace
 
 site_t::site_t(logger& lgr, level_t lvl, const char* in_fmt, const array_view<arg_type>& in_args)
-    : id(lgr.enumerate_site()), level(lvl), fmt(in_fmt), args(in_args)
+    : hash(fnv_hash(in_fmt)), level(lvl), fmt(in_fmt), args(in_args)
 {
     std::generate(args.begin(), args.end(), gen_args(in_fmt));
     lgr.add_site(*this);

@@ -14,10 +14,10 @@ class handler;
 class logger
 {
 public:
-    logger(): level_(level_debug), next_site_(0)
+    logger(): level_(level_debug)
     { }
 
-    explicit logger(level_t level): level_(level), next_site_(0)
+    explicit logger(level_t level): level_(level)
     { }
 
     level_t level() const
@@ -34,8 +34,6 @@ public:
 
     void add_site(const site_t& site);
 
-    int enumerate_site();
-
     void log(const site_t* site, ...);
 
 private:
@@ -43,7 +41,6 @@ private:
 
     handlers_t handlers_;
     level_t level_;
-    int next_site_;
 };
 
 } // namespace uclog
