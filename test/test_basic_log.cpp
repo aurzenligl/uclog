@@ -30,7 +30,7 @@ TEST(basic_log, logs)
     handler handl(stor);
     lgr.add_handler(handl);
 
-#define LOG(LEVEL, FMT, ...) UCLOG_BASIC_LOG(&lgr, LEVEL, FMT, __VA_ARGS__)
+#define LOG(LEVEL, FMT, ...) UCLOG_BASIC_LOG(lgr, LEVEL, FMT, __VA_ARGS__)
     LOG(info, "first %d %d", 1, 2);
     LOG(warning, "second %d", 42);
     LOG(error, "third");
@@ -55,7 +55,7 @@ TEST(basic_log, logs_multiple_times)
     handler handl(stor);
     lgr.add_handler(handl);
 
-#define LOG(LEVEL, FMT, ...) UCLOG_BASIC_LOG(&lgr, LEVEL, FMT, __VA_ARGS__)
+#define LOG(LEVEL, FMT, ...) UCLOG_BASIC_LOG(lgr, LEVEL, FMT, __VA_ARGS__)
     auto log = [&](){ LOG(info, "first"); };
 #undef LOG
 
@@ -76,7 +76,7 @@ TEST(basic_log, logs_name_collision)
 
     int site = 42;
 
-#define LOG(LEVEL, FMT, ...) UCLOG_BASIC_LOG(&lgr, LEVEL, FMT, __VA_ARGS__)
+#define LOG(LEVEL, FMT, ...) UCLOG_BASIC_LOG(lgr, LEVEL, FMT, __VA_ARGS__)
     LOG(info, "first %d", site);
 #undef LOG
 
@@ -103,7 +103,7 @@ TEST(basic_log, no_multiple_arg_evaluation)
     };
     y_t y;
 
-#define LOG(LEVEL, FMT, ...) UCLOG_BASIC_LOG(&lgr, LEVEL, FMT, __VA_ARGS__)
+#define LOG(LEVEL, FMT, ...) UCLOG_BASIC_LOG(lgr, LEVEL, FMT, __VA_ARGS__)
     LOG(info, "%d", ++x);
     LOG(info, "%d %d", x + x, x - x);
     LOG(info, "%d", y());
