@@ -41,9 +41,10 @@ def build(ctx):
         use = 'uclog')
 
     ctx(features = 'cxx cxxprogram',
-        target = 'testperflogger',
-        source = ctx.path.ant_glob('test/perf/logger.cpp'),
+        target = 'perf_logger',
+        source = ctx.path.ant_glob('test/perf/perf_logger.cpp'),
         cxxflags = '-g -Wall -DNDEBUG -O3 -std=c++11',
+        lib = 'benchmark pthread',
         use = 'uclog')
 
     ctx.add_post_fun(Tools.waf_unit_test.summary)
@@ -55,5 +56,5 @@ def build(ctx):
             always = True)
     if getattr(Options.options, 'perf_logger') or getattr(Options.options, 'perf'):
         ctx(rule = lambda task: os.system(task.inputs[0].abspath()),
-            source = 'testperflogger',
+            source = 'perf_logger',
             always = True)
